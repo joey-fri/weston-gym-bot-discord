@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.DS_Store
+*.log
+
+# Fichier exemple à versionner
+!.env.example
+

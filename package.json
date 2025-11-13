@@ -1,0 +1,50 @@
+{
+  "name": "weston-gym-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord professionnel pour la gestion complète d'une salle de sport. Gestion du statut, planning automatique, notifications SMS via Twilio, et système de règles.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "dev": "cross-env NODE_ENV=development ts-node src/index.ts"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "discord-bot",
+    "discordjs",
+    "gym",
+    "gym-management",
+    "planning",
+    "twilio",
+    "sms",
+    "typescript",
+    "nodejs",
+    "automation",
+    "scheduling",
+    "cron"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/votre-username/weston-gym-bot-discord.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "twilio": "^5.3.5"
+  },
+  "nodeVersion": "23.1.0",
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/node-cron": "^3.0.11",
+    "cross-env": "^10.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
