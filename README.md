@@ -50,7 +50,7 @@ Weston Gym Bot est une solution complète de gestion de salle de sport via Disco
 
 1. **Cloner le repository**
    ```bash
-   git clone https://github.com/votre-username/weston-gym-bot-discord.git
+   git clone https://github.com/joey-fri/weston-gym-bot-discord.git
    cd weston-gym-bot-discord
    ```
 
