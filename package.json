@@ -28,7 +28,7 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "https://github.com/votre-username/weston-gym-bot-discord.git"
+    "url": "https://github.com/joey-fri/weston-gym-bot-discord.git"
   },
   "engines": {
     "node": ">=18.0.0"
