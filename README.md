@@ -189,9 +189,6 @@ src/
 
 ## 👤 Auteur
 
-Développé avec ❤️ pour la gestion de salle de sport
+Développé avec ❤️ pour la gestion de notre salle de sport associative.
 
 ---
-
-**Note**: Ce projet est destiné à servir d'exemple de code professionnel et documenté pour un développeur fullstack senior.
-
