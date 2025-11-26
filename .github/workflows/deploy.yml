@@ -40,22 +40,26 @@ jobs:
           echo "Deploying to: $SFTP_USER@$SFTP_HOST:$REMOTE_PATH (port $SFTP_PORT)"
           
           # Options SCP communes
-          SCP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR"
+          SCP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
           
-          echo "Transferring dist/ directory contents..."
-          # Transférer le contenu de dist/ récursivement
-          # Utiliser find pour transférer tous les fichiers en préservant la structure
-          cd dist
-          find . -type f | while read file; do
-            echo "Transferring: $file"
-            # SCP crée automatiquement les répertoires parents
-            sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT "$file" $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/$file" || exit 1
-          done
-          cd ..
+          echo "Transferring dist/ directory..."
+          # Transférer le dossier dist/ entier avec SCP récursif
+          # Cela préserve la structure des répertoires
+          if ! sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT -r dist $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/"; then
+            echo "Error: Failed to transfer dist/ directory"
+            exit 1
+          fi
           
           echo "Transferring package.json..."
           # Transférer package.json
-          sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT package.json $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/package.json" || exit 1
+          if ! sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT package.json $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/"; then
+            echo "Error: Failed to transfer package.json"
+            exit 1
+          fi
+          
+          echo "Verifying deployment..."
+          # Vérifier que les fichiers principaux sont présents
+          sshpass -p "$SFTP_PASS" ssh $SCP_OPTS -p $SFTP_PORT $SFTP_USER@$SFTP_HOST "test -f $REMOTE_PATH/dist/index.js && echo 'index.js found' || echo 'WARNING: index.js not found'" || true
           
           echo "Deployment completed successfully!"
 
