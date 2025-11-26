@@ -1,6 +1,5 @@
 node_modules
-# dist est versionné pour le déploiement sur Peeblehost
-# dist
+dist
 .env
 .env.local
 .env.development

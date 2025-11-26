@@ -188,33 +188,41 @@ src/
 
 ## 🚀 Déploiement automatique
 
-Le projet est configuré pour un déploiement automatique sur Peeblehost via GitHub Actions.
+Le projet est configuré pour un déploiement automatique sur Peeblehost via GitHub Actions et SFTP.
 
 ### Fonctionnement
 
 1. **Workflow automatique** : À chaque push vers la branche `main`, un workflow GitHub Actions se déclenche automatiquement
 2. **Compilation** : Le projet TypeScript est compilé en JavaScript dans le dossier `dist/`
-3. **Commit automatique** : Les fichiers compilés sont automatiquement commités et poussés dans `main`
-4. **Récupération** : Peeblehost pull automatiquement depuis la branche `main` à chaque redémarrage
+3. **Déploiement SFTP** : Les fichiers compilés sont automatiquement transférés sur le serveur Peeblehost via SFTP
+4. **Redémarrage** : Le serveur Peeblehost redémarre automatiquement le bot avec les nouveaux fichiers
+
+### Configuration GitHub Secrets
+
+Pour que le déploiement SFTP fonctionne, vous devez configurer les secrets suivants dans votre repository GitHub (Settings → Secrets and variables → Actions) :
+
+- `SFTP_HOST` - Adresse du serveur SFTP (ex: `sftp.pebblehost.com` ou l'IP)
+- `SFTP_USERNAME` - Nom d'utilisateur SFTP
+- `SFTP_PASSWORD` - Mot de passe SFTP
+- `SFTP_PORT` - Port SFTP (optionnel, défaut: `22`)
+- `SFTP_REMOTE_PATH` - Chemin distant sur le serveur (optionnel, défaut: `/home/container`)
 
 ### Configuration Peeblehost
 
-Le serveur Peeblehost doit être configuré avec :
-- **Git URL** : `https://github.com/joey-fri/weston-gym-bot-discord`
-- **Git Branch** : `main`
+Vous pouvez désactiver la gestion Git dans Peeblehost puisque le déploiement se fait maintenant directement via SFTP depuis GitHub Actions.
 
 ### Variables d'environnement sur Peeblehost
 
 Les variables d'environnement doivent être configurées via SFTP en créant un fichier `.env` à la racine du projet sur le serveur (voir section [Configuration](#-configuration) pour la liste complète).
 
-Les variables d'environnement ne sont pas incluses dans le déploiement Git pour des raisons de sécurité.
+Les variables d'environnement ne sont pas incluses dans le déploiement pour des raisons de sécurité.
 
 ### Déploiement manuel
 
 Si vous devez déployer manuellement :
 
 1. Compiler le projet localement : `npm run build`
-2. Commiter et pousser les changements : `git add dist/ && git commit -m "chore: Build" && git push`
+2. Transférer les fichiers via SFTP : `scp -r dist/* username@host:/path/` et `scp package.json username@host:/path/`
 
 ## 👤 Auteur
 
