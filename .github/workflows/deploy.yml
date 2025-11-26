@@ -27,8 +27,8 @@ jobs:
 
       - name: Deploy to Peeblehost via SFTP
         run: |
-          # Installer sshpass pour l'authentification par mot de passe
-          sudo apt-get update && sudo apt-get install -y sshpass
+          # Installer lftp qui supporte mieux SFTP
+          sudo apt-get update && sudo apt-get install -y lftp
           
           # Variables
           REMOTE_PATH="${{ secrets.SFTP_REMOTE_PATH || '.' }}"
@@ -37,29 +37,21 @@ jobs:
           SFTP_USER="${{ secrets.SFTP_USERNAME }}"
           SFTP_PASS="${{ secrets.SFTP_PASSWORD }}"
           
-          echo "Deploying to: $SFTP_USER@$SFTP_HOST:$REMOTE_PATH (port $SFTP_PORT)"
+          echo "Deploying to: sftp://$SFTP_USER@$SFTP_HOST:$SFTP_PORT$REMOTE_PATH"
           
-          # Options SCP communes
-          SCP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          # Utiliser lftp pour transférer les fichiers via SFTP
+          # lftp gère mieux les serveurs SFTP purs
+          lftp -c "
+          set sftp:auto-confirm yes
+          set sftp:connect-program 'ssh -a -x -p $SFTP_PORT'
+          open -u $SFTP_USER,$SFTP_PASS sftp://$SFTP_HOST:$SFTP_PORT
+          cd $REMOTE_PATH || mkdir -p $REMOTE_PATH; cd $REMOTE_PATH
+          mirror -R -v dist .
+          put package.json
+          bye
+          "
           
-          echo "Transferring dist/ directory..."
-          # Transférer le dossier dist/ entier avec SCP récursif
-          # Cela préserve la structure des répertoires
-          if ! sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT -r dist $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/"; then
-            echo "Error: Failed to transfer dist/ directory"
-            exit 1
-          fi
-          
-          echo "Transferring package.json..."
-          # Transférer package.json
-          if ! sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT package.json $SFTP_USER@$SFTP_HOST:"$REMOTE_PATH/"; then
-            echo "Error: Failed to transfer package.json"
-            exit 1
-          fi
-          
-          echo "Verifying deployment..."
-          # Vérifier que les fichiers principaux sont présents
-          sshpass -p "$SFTP_PASS" ssh $SCP_OPTS -p $SFTP_PORT $SFTP_USER@$SFTP_HOST "test -f $REMOTE_PATH/dist/index.js && echo 'index.js found' || echo 'WARNING: index.js not found'" || true
+          echo "Deployment completed successfully!"
           
           echo "Deployment completed successfully!"
 
