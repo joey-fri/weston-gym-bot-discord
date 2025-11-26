@@ -178,6 +178,7 @@ async function handleButtonInteraction(
 
 /**
  * Met à jour le statut de la salle et rafraîchit le message.
+ * N'affiche un message que s'il y a une erreur.
  * 
  * @param {ButtonInteraction} interaction - L'interaction de bouton
  * @param {GymStatusManager} statusManager - Gestionnaire du statut
@@ -190,27 +191,35 @@ async function updateGymStatus(
   status: GymStatus,
   actor: string
 ): Promise<void> {
-  if (!statusManager.hasStatusMessage) {
-    await interaction.reply({
-      content: 'Aucun message de statut trouvé. Utilisez `/gym status` pour le publier.',
-      ephemeral: true
-    });
-    return;
-  }
+  try {
+    if (!statusManager.hasStatusMessage) {
+      await interaction.reply({
+        content: 'Aucun message de statut trouvé. Utilisez `/gym status` pour le publier.',
+        ephemeral: true
+      });
+      return;
+    }
 
-  statusManager.updateStatus(status, actor);
-  await statusManager.refreshStatusMessage();
+    // Différer la mise à jour pour éviter un message visible
+    await interaction.deferUpdate();
 
-  if (interaction.replied || interaction.deferred) {
-    await interaction.followUp({
-      content: `Statut mis à jour: ${status}.`,
-      ephemeral: true
-    });
-  } else {
-    await interaction.reply({
-      content: `Statut mis à jour: ${status}.`,
-      ephemeral: true
-    });
+    statusManager.updateStatus(status, actor);
+    await statusManager.refreshStatusMessage();
+  } catch (error) {
+    logger.error('Erreur lors de la mise à jour du statut de la salle.', error);
+    
+    // Afficher un message d'erreur seulement en cas de problème
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: `Erreur lors de la mise à jour du statut: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        ephemeral: true
+      });
+    } else {
+      await interaction.reply({
+        content: `Erreur lors de la mise à jour du statut: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        ephemeral: true
+      });
+    }
   }
 }
 
