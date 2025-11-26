@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelType,
   EmbedBuilder,
   Message,
   TextChannel
@@ -114,7 +115,8 @@ export class GymStatusManager {
   }
 
   /**
-   * Met à jour le message de statut existant avec les informations actuelles.
+   * Met à jour le message de statut existant en le supprimant et en créant un nouveau.
+   * Cela génère une notification Discord pour les utilisateurs.
    * Ne fait rien si aucun message n'a été publié.
    *
    * @returns {Promise<void>} Promise qui se résout quand le message est mis à jour
@@ -124,11 +126,31 @@ export class GymStatusManager {
       return;
     }
 
+    // Récupérer le canal depuis le message existant
+    const channel = this.statusMessage.channel;
+    if (channel.type !== ChannelType.GuildText) {
+      logger.warn('Le canal du message de statut n\'est pas un salon texte.');
+      return;
+    }
+
+    const textChannel = channel as TextChannel;
+    const oldMessage = this.statusMessage;
+
     try {
-      await this.statusMessage.edit({
+      // Supprimer l'ancien message
+      try {
+        await oldMessage.delete();
+      } catch (error) {
+        logger.warn('Impossible de supprimer le message de statut précédent.', error);
+      }
+
+      // Créer un nouveau message (génère une notification)
+      const newMessage = await textChannel.send({
         embeds: [this.buildEmbed()],
         components: [this.buildActionRow()]
       });
+
+      this.statusMessage = newMessage;
     } catch (error) {
       logger.error('Erreur lors de la mise à jour du message de statut.', error);
     }
