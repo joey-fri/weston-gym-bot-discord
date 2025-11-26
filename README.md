@@ -201,11 +201,19 @@ Le projet est configuré pour un déploiement automatique sur Peeblehost via Git
 
 Pour que le déploiement SFTP fonctionne, vous devez configurer les secrets suivants dans votre repository GitHub (Settings → Secrets and variables → Actions) :
 
-- `SFTP_HOST` - Adresse du serveur SFTP (ex: `sftp.pebblehost.com` ou l'IP)
-- `SFTP_USERNAME` - Nom d'utilisateur SFTP
-- `SFTP_PASSWORD` - Mot de passe SFTP
-- `SFTP_PORT` - Port SFTP (optionnel, défaut: `22`)
+1. **Récupérez vos informations SFTP depuis le panneau Peeblehost** (bouton "SFTP Details")
+2. **Ajoutez les secrets suivants** :
+
+- `SFTP_HOST` - Adresse du serveur (sans `sftp://`, ex: `uk61.pebblehost.net`)
+- `SFTP_USERNAME` - Nom d'utilisateur SFTP (ex: `contact@westongym.fr.e35d1313`)
+- `SFTP_PASSWORD` - Mot de passe SFTP (le même que celui du panneau Peeblehost)
+- `SFTP_PORT` - Port SFTP (ex: `2222` - optionnel, défaut: `22`)
 - `SFTP_REMOTE_PATH` - Chemin distant sur le serveur (optionnel, défaut: `/home/container`)
+
+**Exemple de configuration basé sur Peeblehost :**
+- Si l'adresse SFTP est `sftp://uk61.pebblehost.net:2222`, alors :
+  - `SFTP_HOST` = `uk61.pebblehost.net`
+  - `SFTP_PORT` = `2222`
 
 ### Configuration Peeblehost
 
