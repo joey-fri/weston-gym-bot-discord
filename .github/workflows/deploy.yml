@@ -1,4 +1,4 @@
-name: Deploy to Peeblehost
+name: Build and Deploy
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,42 +34,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Save files for deployment
+      - name: Commit and push dist files
         run: |
-          # Créer un répertoire temporaire pour sauvegarder les fichiers
-          mkdir -p /tmp/deploy-files
-          # Copier dist/ et package.json
-          cp -r dist /tmp/deploy-files/
-          cp package.json /tmp/deploy-files/
-
-      - name: Create or update deploy branch
-        run: |
-          # Essayer de récupérer la branche deploy si elle existe
-          git fetch origin deploy:deploy 2>/dev/null || true
-          
-          # Vérifier si la branche locale existe maintenant
-          if git show-ref --verify --quiet refs/heads/deploy; then
-            # La branche existe, la checkout et la nettoyer
-            git checkout deploy
-            # Supprimer tous les fichiers existants sauf .git
-            find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + 2>/dev/null || true
-          else
-            # Créer une nouvelle branche orphan
-            git checkout --orphan deploy
-            # Supprimer tous les fichiers s'il y en a
-            git rm -rf . 2>/dev/null || true
-          fi
-
-      - name: Copy dist files to root
-        run: |
-          # Copier le contenu de dist/ à la racine
-          cp -r /tmp/deploy-files/dist/* .
-          # Copier package.json
-          cp /tmp/deploy-files/package.json .
-
-      - name: Commit and push to deploy branch
-        run: |
-          git add .
-          git commit -m "Deploy: $(date -u +'%Y-%m-%d %H:%M:%S UTC') [skip ci]" || exit 0
-          git push origin deploy --force --set-upstream
+          git add dist/
+          git diff --staged --quiet || git commit -m "chore: Build and update dist files [skip ci]"
+          git push origin main
 

@@ -193,28 +193,28 @@ Le projet est configuré pour un déploiement automatique sur Peeblehost via Git
 ### Fonctionnement
 
 1. **Workflow automatique** : À chaque push vers la branche `main`, un workflow GitHub Actions se déclenche automatiquement
-2. **Compilation** : Le projet TypeScript est compilé en JavaScript
-3. **Déploiement** : Les fichiers compilés sont déployés dans la branche `deploy` (contenu de `dist/` à la racine)
-4. **Récupération** : Peeblehost pull automatiquement depuis la branche `deploy` à chaque redémarrage
+2. **Compilation** : Le projet TypeScript est compilé en JavaScript dans le dossier `dist/`
+3. **Commit automatique** : Les fichiers compilés sont automatiquement commités et poussés dans `main`
+4. **Récupération** : Peeblehost pull automatiquement depuis la branche `main` à chaque redémarrage
 
 ### Configuration Peeblehost
 
 Le serveur Peeblehost doit être configuré avec :
 - **Git URL** : `https://github.com/joey-fri/weston-gym-bot-discord`
-- **Git Branch** : `deploy`
+- **Git Branch** : `main`
 
 ### Variables d'environnement sur Peeblehost
 
-Assurez-vous de configurer toutes les variables d'environnement nécessaires dans le panneau de contrôle Peeblehost (voir section [Configuration](#-configuration) pour la liste complète).
+Les variables d'environnement doivent être configurées via SFTP en créant un fichier `.env` à la racine du projet sur le serveur (voir section [Configuration](#-configuration) pour la liste complète).
 
-Les variables d'environnement doivent être définies directement sur Peeblehost, elles ne sont pas incluses dans le déploiement Git pour des raisons de sécurité.
+Les variables d'environnement ne sont pas incluses dans le déploiement Git pour des raisons de sécurité.
 
 ### Déploiement manuel
 
 Si vous devez déployer manuellement :
 
 1. Compiler le projet localement : `npm run build`
-2. Les fichiers dans `dist/` seront automatiquement déployés au prochain push vers `main`
+2. Commiter et pousser les changements : `git add dist/ && git commit -m "chore: Build" && git push`
 
 ## 👤 Auteur
 
