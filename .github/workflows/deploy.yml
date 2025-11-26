@@ -32,6 +32,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Save files for deployment
+        run: |
+          # Créer un répertoire temporaire pour sauvegarder les fichiers
+          mkdir -p /tmp/deploy-files
+          # Copier dist/ et package.json
+          cp -r dist /tmp/deploy-files/
+          cp package.json /tmp/deploy-files/
+
       - name: Create or update deploy branch
         run: |
           # Vérifier si la branche deploy existe
@@ -45,15 +53,15 @@ jobs:
             # Créer une nouvelle branche orphan
             git checkout --orphan deploy
             # Supprimer tous les fichiers
-            git rm -rf .
+            git rm -rf . || true
           fi
 
       - name: Copy dist files to root
         run: |
           # Copier le contenu de dist/ à la racine
-          cp -r dist/* .
+          cp -r /tmp/deploy-files/dist/* .
           # Copier package.json
-          cp package.json .
+          cp /tmp/deploy-files/package.json .
 
       - name: Commit and push to deploy branch
         run: |
