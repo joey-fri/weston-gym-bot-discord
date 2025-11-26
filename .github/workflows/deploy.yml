@@ -33,13 +33,21 @@ jobs:
           # Variables
           REMOTE_PATH="${{ secrets.SFTP_REMOTE_PATH || '/home/container' }}"
           SFTP_PORT="${{ secrets.SFTP_PORT || 22 }}"
+          SFTP_HOST="${{ secrets.SFTP_HOST }}"
+          SFTP_USER="${{ secrets.SFTP_USERNAME }}"
+          SFTP_PASS="${{ secrets.SFTP_PASSWORD }}"
           
-          # Créer le répertoire distant s'il n'existe pas
-          sshpass -p "${{ secrets.SFTP_PASSWORD }}" ssh -o StrictHostKeyChecking=no -p $SFTP_PORT ${{ secrets.SFTP_USERNAME }}@${{ secrets.SFTP_HOST }} "mkdir -p $REMOTE_PATH"
+          # Options SCP communes
+          SCP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR"
           
+          echo "Transferring dist/ directory..."
           # Transférer le dossier dist/ récursivement via SCP
-          sshpass -p "${{ secrets.SFTP_PASSWORD }}" scp -o StrictHostKeyChecking=no -P $SFTP_PORT -r dist/* ${{ secrets.SFTP_USERNAME }}@${{ secrets.SFTP_HOST }}:$REMOTE_PATH/
+          # SCP crée automatiquement les répertoires si nécessaire
+          sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT -r dist $SFTP_USER@$SFTP_HOST:$REMOTE_PATH/ || exit 1
           
+          echo "Transferring package.json..."
           # Transférer package.json
-          sshpass -p "${{ secrets.SFTP_PASSWORD }}" scp -o StrictHostKeyChecking=no -P $SFTP_PORT package.json ${{ secrets.SFTP_USERNAME }}@${{ secrets.SFTP_HOST }}:$REMOTE_PATH/
+          sshpass -p "$SFTP_PASS" scp $SCP_OPTS -P $SFTP_PORT package.json $SFTP_USER@$SFTP_HOST:$REMOTE_PATH/ || exit 1
+          
+          echo "Deployment completed successfully!"
 
