@@ -90,6 +90,11 @@ export interface AppConfig {
     /** Fichier de log des signatures */
     logFile: string;
   };
+  /** Configuration des rappels de poubelles */
+  trash: {
+    /** Nom du channel Discord pour les rappels de poubelles */
+    channelName: string;
+  };
   /** Timezone de l'application (format IANA) */
   timezone: string;
 }
@@ -221,6 +226,9 @@ export const config: AppConfig = {
   rules: {
     memberRoleName: process.env.MEMBER_ROLE_NAME ?? 'Membre',
     logFile: process.env.RULES_LOG_FILE ?? 'signatures_log.txt'
+  },
+  trash: {
+    channelName: process.env.TRASH_CHANNEL_NAME ?? 'rappels-poubelles'
   },
   timezone: process.env.APP_TIMEZONE ?? 'Europe/Paris'
 };

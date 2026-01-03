@@ -4,6 +4,7 @@ import { GymStatusManager } from './features/status/gymStatusManager';
 import { GateService } from './features/gate/gateService';
 import { RulesService } from './features/rules/rulesService';
 import { PlanningManager } from './features/planning/planningManager';
+import { TrashReminderService } from './features/trash/trashReminderService';
 import { registerEvents } from './events/registerEvents';
 import { config } from './config/env';
 import { logger } from './utils/logger';
@@ -35,13 +36,15 @@ async function main(): Promise<void> {
   const gateService = new GateService(config.twilio);
   const rulesService = new RulesService();
   const planningManager = new PlanningManager(client, config.discord.guildId);
+  const trashReminderService = new TrashReminderService(client, config.discord.guildId);
 
   registerEvents({
     client,
     statusManager,
     gateService,
     rulesService,
-    planningManager
+    planningManager,
+    trashReminderService
   });
 
   try {

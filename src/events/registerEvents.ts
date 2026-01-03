@@ -11,6 +11,7 @@ import { GymStatusButton, GymStatusManager } from '../features/status/gymStatusM
 import { GateService } from '../features/gate/gateService';
 import { RulesService } from '../features/rules/rulesService';
 import { PlanningManager } from '../features/planning/planningManager';
+import { TrashReminderService } from '../features/trash/trashReminderService';
 import { GymCommandSub } from '../discord/commands';
 import { logger } from '../utils/logger';
 
@@ -29,6 +30,8 @@ export interface EventContext {
   rulesService: RulesService;
   /** Gestionnaire du planning */
   planningManager: PlanningManager;
+  /** Service de rappels de poubelles */
+  trashReminderService: TrashReminderService;
 }
 
 /**
@@ -52,7 +55,7 @@ export interface EventContext {
  * ```
  */
 export function registerEvents(context: EventContext): void {
-  const { client, planningManager } = context;
+  const { client, planningManager, trashReminderService } = context;
 
   client.once('ready', async () => {
     if (!client.user) {
@@ -65,6 +68,12 @@ export function registerEvents(context: EventContext): void {
       await planningManager.initialize();
     } catch (error) {
       logger.error('Erreur lors de l\'initialisation du planning.', error);
+    }
+
+    try {
+      await trashReminderService.initialize();
+    } catch (error) {
+      logger.error('Erreur lors de l\'initialisation du service de rappels de poubelles.', error);
     }
   });
 
